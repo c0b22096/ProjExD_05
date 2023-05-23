@@ -27,7 +27,7 @@ class Player(pg.sprite.Sprite):
         self.state = "normal" # プレイヤーの状態
         self.hyper_life = 0 # 無敵状態時間
 
-    def change_state(self, state, hyper_life):
+    def change_state(self, state: str, hyper_life: int):
         """
         右シフトキーが押された時に, プレイヤーを無敵状態にする関数
         引数1 state : プレイヤーの状態

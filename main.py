@@ -1,5 +1,6 @@
 import sys
 import pygame as pg
+import time
 
 WIDTH = 1024
 HEIGHT = 1024
@@ -23,6 +24,31 @@ class Player(pg.sprite.Sprite):
         self.gravity_vel = 5
         self.jump_power = 256
         self.isGround = False
+        self.state = "normal" # プレイヤーの状態
+        self.hyper_life = 0 # 無敵状態時間
+
+    def change_state(self, state, hyper_life):
+        """
+        右シフトキーが押された時に, プレイヤーを無敵状態にする関数
+        引数1 state : プレイヤーの状態
+        引数2 hyper_life : 無敵状態になっている時間
+        戻り値 : なし
+        """
+        self.state = state
+        self.hyper_life = hyper_life
+
+    def check_hyper(self):
+        """
+        プレイヤーが無敵状態かどうかを判定し, プレイヤーの色を変える
+        戻り値 : なし
+        """
+        if self.state == "hyper":
+            self.image.fill((168, 88, 168))
+            self.hyper_life += -1
+
+        if self.hyper_life < 0:
+            self.state == "normal"
+            self.image.fill((255, 255, 255))
 
     def update(self, key_lst: dict):
         for d in __class__.move_dict:
@@ -36,6 +62,8 @@ class Player(pg.sprite.Sprite):
         if not self.isGround:
             self.rect.y += self.gravity_vel
 
+        self.check_hyper()
+
 class Block(pg.sprite.Sprite):
     size = (32, 32)
 
@@ -46,6 +74,14 @@ class Block(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = pos
 
+class Enemy(pg.sprite.Sprite):
+    def __init__(self, pos):
+        super().__init__()
+        self.image = pg.Surface((64, 64))
+        self.image.fill((255, 0, 0))
+        self.rect = self.image.get_rect()
+        self.rect.center = pos
+
 def main():
     pg.display.set_caption("proto")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -53,10 +89,13 @@ def main():
     bg_img.fill((0, 0, 0))
 
     all_rect_lst = []
+    bre =[]
 
     player = Player((500, HEIGHT - 50))
     all_rect_lst.append(player.rect)
     blocks = pg.sprite.Group()
+    enemys = pg.sprite.Group()
+    enemys.add(Enemy((500, 450)))
     for i in range(256):
         blocks.add(Block((i * Block.size[0], HEIGHT)))
     for i in range(10):
@@ -70,8 +109,10 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return 0
+            
+            if event.type == pg.KEYDOWN and event.key == pg.K_RSHIFT:
+                player.change_state("hyper", 400)
         
-
         key_lst = pg.key.get_pressed()
 
         player.update(key_lst)
@@ -86,8 +127,16 @@ def main():
                     player.rect.bottom = b.rect.top
                     player.isGround = True
 
+        for enemy in pg.sprite.spritecollide(player, enemys, True):
+            if player.state == "hyper":
+                bre.append(0)
+            else:
+                time.sleep()
+                return
+
         screen.blit(bg_img, (0, 0))
         blocks.draw(screen)
+        enemys.draw(screen)
         screen.blit(player.image, player.rect)
         pg.display.update()
 

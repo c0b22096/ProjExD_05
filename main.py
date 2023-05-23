@@ -89,13 +89,13 @@ def main():
     bg_img.fill((0, 0, 0))
 
     all_rect_lst = []
-    bre =[]
+    x = 0
 
     player = Player((500, HEIGHT - 50))
     all_rect_lst.append(player.rect)
     blocks = pg.sprite.Group()
     enemys = pg.sprite.Group()
-    enemys.add(Enemy((500, 450)))
+    enemys.add(Enemy((800, 975)))
     for i in range(256):
         blocks.add(Block((i * Block.size[0], HEIGHT)))
     for i in range(10):
@@ -129,7 +129,7 @@ def main():
 
         for enemy in pg.sprite.spritecollide(player, enemys, True):
             if player.state == "hyper":
-                bre.append(0)
+                x = 1
             else:
                 time.sleep()
                 return

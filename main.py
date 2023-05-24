@@ -25,7 +25,7 @@ class Player(pg.sprite.Sprite):
         self.jump_power = 256
         self.isGround = False
         self.state = "normal" # プレイヤーの状態
-        self.hyper_life = 0 # 無敵状態時間
+        self.hyper_life = 0 # 残りの無敵状態時間
 
     def change_state(self, state: str, hyper_life: int):
         """
@@ -43,12 +43,13 @@ class Player(pg.sprite.Sprite):
         戻り値 : なし
         """
         if self.state == "hyper":
-            self.image.fill((168, 88, 168))
-            self.hyper_life += -1
+            # プレイヤーが無敵状態だったら
+            self.image.fill((168, 88, 168)) # プレイヤーの色を紫にする
+            self.hyper_life += -1 # 残りの無敵状態時間を1秒減らす
 
-        if self.hyper_life < 0:
-            self.state == "normal"
-            self.image.fill((255, 255, 255))
+        if self.hyper_life < 0: # 残りの無敵状態時間が0秒だったら
+            self.state == "normal" # プレイヤーを通常状態にする
+            self.image.fill((255, 255, 255)) # プレイヤーの色を元に戻す
 
     def update(self, key_lst: dict):
         for d in __class__.move_dict:
@@ -111,6 +112,7 @@ def main():
                 return 0
             
             if event.type == pg.KEYDOWN and event.key == pg.K_RSHIFT:
+                # 右シフトキーが押されたら
                 player.change_state("hyper", 400)
         
         key_lst = pg.key.get_pressed()
